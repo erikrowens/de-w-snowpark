@@ -1,3 +1,6 @@
+# Snowflake session params
+config_*.py
+
 # Mac files
 .DS_Store
 

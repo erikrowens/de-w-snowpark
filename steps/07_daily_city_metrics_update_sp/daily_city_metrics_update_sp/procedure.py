@@ -31,8 +31,8 @@ def create_daily_city_metrics_table(session):
 
     dcm = session.create_dataframe([[None]*len(DAILY_CITY_METRICS_SCHEMA.names)], schema=DAILY_CITY_METRICS_SCHEMA) \
                         .na.drop() \
-                        .write.mode('overwrite').save_as_table('ANALYTICS.DAILY_CITY_METRICS')
-    dcm = session.table('ANALYTICS.DAILY_CITY_METRICS')
+                        .write.mode('overwrite').save_as_table('HOL_DB.ANALYTICS.DAILY_CITY_METRICS')
+    dcm = session.table('HOL_DB.ANALYTICS.DAILY_CITY_METRICS')
 
 
 def merge_daily_city_metrics(session):
@@ -85,7 +85,7 @@ def merge_daily_city_metrics(session):
     metadata_col_to_update = {"META_UPDATED_AT": F.current_timestamp()}
     updates = {**cols_to_update, **metadata_col_to_update}
 
-    dcm = session.table('ANALYTICS.DAILY_CITY_METRICS')
+    dcm = session.table('HOL_DB.ANALYTICS.DAILY_CITY_METRICS')
     dcm.merge(daily_city_metrics_stg, (dcm['DATE'] == daily_city_metrics_stg['DATE']) & (dcm['CITY_NAME'] == daily_city_metrics_stg['CITY_NAME']) & (dcm['COUNTRY_DESC'] == daily_city_metrics_stg['COUNTRY_DESC']), \
                         [F.when_matched().update(updates), F.when_not_matched().insert(updates)])
 
@@ -106,7 +106,9 @@ def main(session: Session) -> str:
 # Be aware you may need to type-convert arguments if you add input parameters
 if __name__ == '__main__':
     # Create a local Snowpark session
-    with Session.builder.getOrCreate() as session:
+    # with Session.builder.getOrCreate() as session:
+    from config import session_params
+    with Session.builder.configs(session_params).create() as session:
         import sys
         if len(sys.argv) > 1:
             print(main(session, *sys.argv[1:]))  # type: ignore

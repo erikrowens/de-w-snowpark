@@ -58,7 +58,9 @@ def main(session: Session) -> str:
 # Be aware you may need to type-convert arguments if you add input parameters
 if __name__ == '__main__':
     # Create a local Snowpark session
-    with Session.builder.getOrCreate() as session:
+    from config import session_params
+    with Session.builder.configs(session_params).getOrCreate() as session:
+    # with Session.builder.configs(session_params).create() as session:
         import sys
         if len(sys.argv) > 1:
             print(main(session, *sys.argv[1:]))  # type: ignore

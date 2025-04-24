@@ -45,7 +45,9 @@ def load_all_raw_tables(session):
 
     for s3dir, data in TABLE_DICT.items():
         tnames = data['tables']
-        schema = data['schema']
+        # https://github.com/Snowflake-Labs/sfguide-data-engineering-with-snowpark-python/issues/11
+        # schema = data['schema']
+        schema = 'HOL_DB.' + data['schema']
         for tname in tnames:
             print("Loading {}".format(tname))
             # Only load the first 3 years of data for the order tables at this point
@@ -70,6 +72,8 @@ def validate_raw_tables(session):
 # For local debugging
 if __name__ == "__main__":
     # Create a local Snowpark session
-    with Session.builder.getOrCreate() as session:
+    # with Session.builder.getOrCreate() as session:
+    from config_02 import session_params
+    with Session.builder.configs(session_params).create() as session:
         load_all_raw_tables(session)
 #        validate_raw_tables(session)
